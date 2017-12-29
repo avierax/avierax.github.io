@@ -12,7 +12,6 @@ section, header, footer {
 #wrapper {
     max-width: 600px;
     margin: 0 auto;
-    background: #fff;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     border-radius: 10px;
