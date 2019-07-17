@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Title</title>
+</head>
+<body>
+<script src="core.js" ></script>
+<script>
+    function resetTimer(){
+        let epoc = document.getElementById("password").value;
+        if(!epocExist(epoc)){
+            document.getElementById("message").innerText = "password incorrect";
+            document.getElementById("password").value = "";
+            return;
+        }
+        document.getElementById("message").innerText = "password correct";
+        window.localStorage.setItem("personalEpoc."+epoc, new Date().getTime())
+        document.getElementById("password").value = "";
+    }
+</script>
+<h1>
+    <input type="text" id="password" />
+    <button onclick="resetTimer()" >Reset</button>
+    <div id="message">enter password</div>
+</h1>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+<head>
+    <meta charset=UTF-8>
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+    <link type="text/css" rel="stylesheet" href="digits.css">
+    <link type="text/css" rel="stylesheet" href="numbers.css">
+
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>Web Application Starter Project</title>
+
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <script src="app/app.nocache.js"></script>
+
+    <script language="JavaScript">
+    </script>
+    <script>
+        function getSelectedEpoc(){
+            return window.selectedEpoc!=null?window.selectedEpoc:"smoking";
+        }
+        function ariel_epoc() {
+            return parseInt(window.localStorage.getItem("personalEpoc."+getSelectedEpoc()));
+        }
+
+        function calculateTimeMeasurements(d) {
+            let ellapsed = d - ariel_epoc();
+            let seconds = ellapsed / 1000;
+            let minutes = seconds / 60;
+            let hours = minutes / 60;
+            let days = hours / 24;
+            let weeks = days / 7;
+            let years = days / 365;
+            let secondOfTheMinute = seconds % 60;
+            let minuteOfTheHour = minutes % 60;
+            let hourOfTheDay = hours % 24;
+            let dayOfTheYear = days % 365;
+            let dayOfTheWeek = days % 7;
+            let weekOfTheYear = weeks % (365 / 7);
+
+            return {
+                ellapsed: ellapsed,
+                seconds: seconds,
+                minutes: minutes,
+                hours: hours,
+                days: days,
+                weeks: weeks,
+                years: years,
+                secondOfTheMinute: secondOfTheMinute,
+                minuteOfTheHour: minuteOfTheHour,
+                hourOfTheDay: hourOfTheDay,
+                dayOfTheYear: dayOfTheYear,
+                dayOfTheWeek: dayOfTheWeek,
+                weekOfTheYear: weekOfTheYear
+            }
+        }
+
+        function start(){
+            setTimeout(update, 999);
+        }
+
+        function update() {
+            setTimeout(update, 999);
+            window.title = "Epoc "+getSelectedEpoc();
+            let d = calculateTimeMeasurements(Date.now());
+            console.info(d);
+
+            let t = function (n) {
+                return n - n % 1;
+            };
+            let t1 = function (n) {
+                return n;
+            };
+
+            let string1 = t(d.years) + " years, \t "
+                + t(d.weekOfTheYear) + " weeks, \t"
+                + t(d.dayOfTheWeek) + " days,\t "
+                + t(d.hourOfTheDay) + " hours,\t "
+                + t(d.minuteOfTheHour) + " minutes,\t "
+                + t(d.secondOfTheMinute) + " seconds.";
+
+            let dayzero = ariel_epoc / 1000 / 60 / 60 / 24;
+
+            document.getElementById("epoc").innerText = string1;
+            document.getElementById("epoc2").innerText = ariel_epoc();
+            document.getElementById("epocname").innerText = "Epoc " + getSelectedEpoc();
+            updateNumber('weeks', d.weekOfTheYear | 0);
+            updateNumber('days', d.dayOfTheWeek | 0);
+            updateNumber('hours', d.hourOfTheDay | 0);
+            updateNumber('minutes', d.minuteOfTheHour | 0);
+            updateNumber('seconds', d.secondOfTheMinute | 0);
+        }
+    </script>
+</head>
+
+<!--                                           -->
+<!-- The body can have arbitrary html, or      -->
+<!-- you can leave the body empty if you want  -->
+<!-- to create a completely dynamic UI.        -->
+<!--                                           -->
+<body>
+<template id="digittemplate">
+    <link type="text/css" rel="stylesheet" href="digits.css">
+    <link type="text/css" rel="stylesheet" href="numbers.css">
+
+    <div id="container" style="display: inline-block; margin: -2px; padding: 6px; background-color: black;">
+        <svg class="sevenSeg-svg" viewBox="0 0 57 80" version="1.1" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink" focusable="false" style="width: 100%;">
+            <defs>
+                <polyline id="h-seg" points="11 0, 37 0, 42 5, 37 10, 11 10, 6 5"></polyline>
+                <polyline id="v-seg" points="0 11, 5 6, 10 11, 10 34, 5 39, 0 39"></polyline>
+            </defs>
+            <g class="sevenSegDigit-segGroup" transform="skewX(-5)">
+                <use xlink:href="#h-seg" x="0" y="0" class="sevenSeg-segOn segA"></use>
+                <use xlink:href="#v-seg" x="-48" y="0" transform="scale(-1,1)" class="sevenSeg-segOn segB"></use>
+                <use xlink:href="#v-seg" x="-48" y="-80" transform="scale(-1,-1)" class="sevenSeg-segOn segC"></use>
+                <use xlink:href="#h-seg" x="0" y="70" class="sevenSeg-segOn segD"></use>
+                <use xlink:href="#v-seg" x="0" y="-80" transform="scale(1,-1)" class="sevenSeg-segOn segE"></use>
+                <use xlink:href="#v-seg" x="0" y="0" class="sevenSeg-segOn segF"></use>
+                <use xlink:href="#h-seg" x="0" y="35" class="sevenSeg-segOn segG"></use>
+            </g>
+            <circle cx="52" cy="75" r="5" class="false segPoint"></circle>
+        </svg>
+    </div>
+</template>
+<script>
+    class SevenSegment extends HTMLElement {
+        static get observedAttributes() {
+            return ['value', 'width', 'dot', 'height'];
+        }
+
+        constructor() {
+            super();
+            this.shadow = this.attachShadow({mode: 'open'});
+            let t = document.querySelector('#digittemplate');
+            let clone = document.importNode(t.content, true);
+            this.shadow.appendChild(clone);
+            this.setWidth("100px");
+        }
+
+        setWidth(width) {
+            this.shadow.querySelector("#container").style.width = width;
+        }
+
+        setHeight(height) {
+            this.shadow.querySelector("svg").style.height = height;
+        }
+
+        setValue(value) {
+            this.shadow.querySelector("#container").className = 'number' + value;
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            console.log('Custom square element attributes changed. ');
+            console.log({name: name, oldValue: oldValue, newValue: newValue});
+            switch (name) {
+                case 'value' :
+                    this.setValue(newValue);
+                    break;
+                case 'width' :
+                    this.setWidth(newValue);
+                    break;
+                case 'height' :
+                    this.setHeight(newValue);
+                    break;
+                case 'dot' :
+                    if (newValue)
+                        this.shadow.querySelector('.segPoint').style.fill = 'red';
+                    else
+                        this.shadow.querySelector('.segPoint').style.fill = '#320000';
+                    break;
+            }
+        }
+    }
+
+    function changeEpoc(epoc){
+        window.selectedEpoc = epoc;
+        updateButtons();
+        update();
+    }
+
+    function updateButtons(){
+        let selectedEpoc = getSelectedEpoc();
+        let elementsByClassName = document.getElementsByClassName("epocSelector");
+        for(let i=0;i<elementsByClassName.length; i++){
+            let element = elementsByClassName.item(i);
+            if(!element.id.endsWith(selectedEpoc))
+                element.style = "color: gray";
+            else
+                element.style = "font-weight: bold; color: black";
+        }
+    }
+
+
+    customElements.define("seven-segment", SevenSegment);
+</script>
+<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+
+<h1 id="epocname"></h1>
+<h1 id="epoc"></h1>
+<h1 id="epoc2"></h1>
+
+Weeks:
+<div id="weeks" style="height: 100px; width: 100%; display: inline">
+    <seven-segment class='digit1' value="" width="70px" height="80px"></seven-segment>
+    <seven-segment class='digit0' value="" width="70px" height="80px"></seven-segment>
+</div>
+days
+<div id="days" style="height: 100px; width: 100%; display: inline">
+    <seven-segment class='digit0' value="" width="70px" height="80px"></seven-segment>
+</div>
+<br/>
+hours
+<div id="hours" style="height: 100px; width: 100%; display: inline">
+    <seven-segment class='digit1' value="" width="70px" height="80px"></seven-segment>
+    <seven-segment class='digit0' value="" width="70px" height="80px"></seven-segment>
+</div>
+minutes
+<div id="minutes" style="height: 100px; width: 100%; display: inline">
+    <seven-segment class='digit1' value="" width="70px" height="80px"></seven-segment>
+    <seven-segment class='digit0' value="" width="70px" height="80px"></seven-segment>
+</div>
+seconds
+<div id="seconds" style="height: 100px; width: 100%; display: inline">
+    <seven-segment class='digit1' value="" width="70px" height="80px"></seven-segment>
+    <seven-segment class='digit0' value="" width="70px" height="80px"></seven-segment>
+</div>
+
+<script>
+    function updateNumber(parent, n) {
+        let i = 0;
+        do {
+            let d = n % 10;
+            n = n / 10 | 0;
+            let digit = document.querySelector(`#${parent} .digit${i++}`);
+            if (digit != null)
+                digit.setAttribute('value', d + '');
+            else
+                break;
+        } while (true);
+    }
+
+</script>
+
+<script>
+    updateNumber('weeks', 0);
+    start();
+</script>
+<br/>
+<br/>
+<br/>
+<h1 id="herebebuttons">
+<button style="font-weight: bold; color: black" id="btnSelect_smoking" class="epocSelector" onclick='changeEpoc("smoking");'>"clean" epoc</button>
+<button style="color: gray" id="btnSelect_deepwork" class="epocSelector" onclick='changeEpoc("deepwork");'>deepwork epoc</button>
+</h1>
+</body>
+</html>
